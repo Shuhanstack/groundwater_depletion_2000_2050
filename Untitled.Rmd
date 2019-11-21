@@ -10,14 +10,19 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-##### Set the scene
-in 2000: 
-- initial flow in: 12.8 $\times$ 10^9
-- initial flow out: 18.2 $\times$ 10^9
+###Set the scene
 
-in 2050:
-- initial flow in: 10.3 $\times$ 10^9
-- initial flow out: 27 $\times$ 10^9
+In 2000: 
+
+- initial flow in: 12.8 $\times$ 10<sup>9
+
+- initial flow out: 18.2 $\times$ 10<sup>9
+
+In 2050:
+
+- initial flow in: 10.3 $\times$ 10<sup>9
+
+- initial flow out: 27 $\times$ 10<sup>9
 
 ```{r}
 groundwater <- data.frame(year = c(2000, 2050), flow_in = c(12.8, 10.3), flow_out = c(18.2, 27))
@@ -32,7 +37,9 @@ ggplot(data = groundwater, aes(x = year)) +
   theme_minimal() +
   scale_y_continuous(limits = c(0, 30)) +
   labs(x = "Year", 
-       y = "Groundwater flow") +
+       y = "Groundwater flow (10^9 m^3)", 
+       title = "Figure 1: California groundwater flow (10^9 m^3), 2000-2050.",
+       caption = "Blue line represent  input (2000 = 12.8, 2050 = 10.3) and red line represent loss (2000 = 18.2, 2050 = 27).") +
   geom_text(x = 2030, y = 10,
             label = "flow in",
             color = "blue") +
@@ -41,7 +48,46 @@ ggplot(data = groundwater, aes(x = year)) +
             color = "red") +
   geom_text(x = 2030, y = 16,
             label = "the amount of depletion",
-            color = "black")
+            color = "black") 
 
+ggsave("groundwater 2000-2050.jpg", height = 4, width = 6)
 ```
+
+fit the lines of flow
+
+```{r}
+flow_in <- lm(flow_in ~ year, data = groundwater)
+flow_in
+flow_in_eqn <- function(year){
+  flow_in$coefficients[1] + flow_in$coefficients[2]*year
+  }
+
+flow_out <- lm(flow_out ~ year, data = groundwater)
+flow_out
+
+flow_out_eqn <- function(year){
+  flow_out$coefficients[1] + flow_out$coefficients[2]*year
+}
+
+flow_out_eqn(2050)
+flow_in_eqn(2050)
+```
+
+calculate the change in stock
+```{r}
+cum_flow_change <- function(year){
+  0.5*(year-2000)*(flow_in_eqn(year) - flow_out_eqn(year)) + (flow_in_eqn(2000)-flow_out_eqn(2000))*0.5*(year-2000)
+}
+
+cum_flow_change(2050)
+
+stock_exp <- 350
+stock_min <- 190
+stock_max <- 550
+
+stock_50_exp <- stock_exp + cum_flow_change(2050)
+```
+
+
+
 
