@@ -24,7 +24,7 @@ groundwater <- data.frame(year = c(2000, 2050), flow_in = c(12.8, 10.3), flow_ou
 
 ggplot(data = groundwater, aes(x = year)) +
   geom_ribbon(aes(ymin = flow_in, ymax = flow_out),
-              alpha = 0.2) +
+              alpha = 0.1) +
   geom_point(aes(y = flow_in), color = "blue") +
   geom_point(aes(y = flow_out), color = "red") +
   geom_line(aes(y = flow_in), color = "blue") +
@@ -39,9 +39,9 @@ ggplot(data = groundwater, aes(x = year)) +
   geom_text(x = 2030, y = 25,
             label = "flow out",
             color = "red") +
-  geom_text(x = 2030, y = 25,
-            label = "flow out",
-            color = "red")
+  geom_text(x = 2030, y = 16,
+            label = "the amount of depletion",
+            color = "black")
 
 ```
 
