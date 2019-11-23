@@ -25,7 +25,7 @@ In 2050:
 - initial flow out: 27 $\times$ 10<sup>9
 
 ```{r}
-groundwater <- data.frame(year = c(2000, 2050), flow_in = c(12.8, 10.3), flow_out = c(18.2, 27))
+groundwater <- data.frame(year = c(2000, 2050), flow_in = c(12.8, 8.5), flow_out = c(18.2, 18.5))
 
 ggplot(data = groundwater, aes(x = year)) +
   geom_ribbon(aes(ymin = flow_in, ymax = flow_out),
@@ -38,19 +38,19 @@ ggplot(data = groundwater, aes(x = year)) +
   scale_y_continuous(limits = c(0, 30)) +
   labs(x = "Year", 
        y = "Groundwater flow (10^9 m^3)", 
-       title = "Figure 1: California groundwater flow (10^9 m^3), 2000-2050.",
-       caption = "Blue line represent  input (2000 = 12.8, 2050 = 10.3) and red line represent loss (2000 = 18.2, 2050 = 27).") +
-  geom_text(x = 2030, y = 10,
+       title = "Figure 1: California groundwater flow 2000-2050",
+       caption = "Blue line represent input (2000 = 12.8, 2050 = 8.5) \n Red line represent loss (2000 = 18.2, 2050 = 18.5)") +
+  geom_text(x = 2030, y = 8,
             label = "flow in",
             color = "blue") +
-  geom_text(x = 2030, y = 25,
+  geom_text(x = 2030, y = 21,
             label = "flow out",
             color = "red") +
-  geom_text(x = 2030, y = 16,
+  geom_text(x = 2030, y = 15,
             label = "the amount of depletion",
             color = "black") 
 
-ggsave("groundwater 2000-2050.jpg", height = 4, width = 6)
+ggsave("groundwater flow 2000-2050.jpg", height = 5, width = 6)
 ```
 
 ####fit the lines of flow
@@ -73,9 +73,6 @@ flow_out_eqn <- function(year){
 
 ####calculate groundwater stock in 2050
 ```{r}
-flow_out_eqn(2050)
-flow_in_eqn(2050)
-
 cum_flow_change <- function(year){
   0.5*(year-2000)*(flow_in_eqn(year) - flow_out_eqn(year)) + (flow_in_eqn(2000)-flow_out_eqn(2000))*0.5*(year-2000)
 }
@@ -84,11 +81,11 @@ stock_exp <- 350
 stock_min <- 190
 stock_max <- 550
 
-stock_fin_exp <- stock_exp + cum_flow_change(2036)
+stock_fin_exp <- stock_exp + cum_flow_change(2046)
 stock_fin_exp
-stock_fin_min <- stock_min + cum_flow_change(2024)
+stock_fin_min <- stock_min + cum_flow_change(2028)
 stock_fin_min
-stock_fin_max <- stock_max + cum_flow_change(2049)
+stock_fin_max <- stock_max + cum_flow_change(2066)
 stock_fin_max
 ```
 
@@ -113,7 +110,7 @@ ggplot(data = stock_year, aes(x = year, y = stock_value)) +
             linetype = 2) +
   labs(x = "Year",
        y = "Groundwater stock (10^9 m^3)",
-       title = "Figure 2: California groundwater stock (10^9 m^3), 2000-2050.") +
+       title = "Figure 2: California groundwater stock 2000-2050") +
   scale_color_discrete(name = "Stock type",
                        labels = c("expected value", "lower limit", "upper limit"))
 
