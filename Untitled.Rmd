@@ -53,7 +53,7 @@ ggplot(data = groundwater, aes(x = year)) +
 ggsave("groundwater 2000-2050.jpg", height = 4, width = 6)
 ```
 
-fit the lines of flow
+####fit the lines of flow
 
 ```{r}
 flow_in <- lm(flow_in ~ year, data = groundwater)
@@ -69,25 +69,55 @@ flow_out_eqn <- function(year){
   flow_out$coefficients[1] + flow_out$coefficients[2]*year
 }
 
-flow_out_eqn(2050)
-flow_in_eqn(2050)
 ```
 
-calculate the change in stock
+####calculate groundwater stock in 2050
 ```{r}
+flow_out_eqn(2050)
+flow_in_eqn(2050)
+
 cum_flow_change <- function(year){
   0.5*(year-2000)*(flow_in_eqn(year) - flow_out_eqn(year)) + (flow_in_eqn(2000)-flow_out_eqn(2000))*0.5*(year-2000)
 }
-
-cum_flow_change(2050)
 
 stock_exp <- 350
 stock_min <- 190
 stock_max <- 550
 
-stock_50_exp <- stock_exp + cum_flow_change(2050)
+stock_fin_exp <- stock_exp + cum_flow_change(2036)
+stock_fin_exp
+stock_fin_min <- stock_min + cum_flow_change(2024)
+stock_fin_min
+stock_fin_max <- stock_max + cum_flow_change(2049)
+stock_fin_max
 ```
 
+####How does groundwater stock change 2000-2050?
+```{r}
+year <- seq(from = 2000, to = 2050)
+cum_flow_change <- cum_flow_change(year)
 
+stock_year <- data.frame(year = year, 
+                         expected_volume = stock_exp + cum_flow_change, 
+                         lower_limit = stock_min + cum_flow_change,
+                         upper_limit = stock_max + cum_flow_change) %>% 
+  pivot_longer(expected_volume:upper_limit, names_to = "stock_type", values_to = "stock_value")
+
+ggplot(data = stock_year, aes(x = year, y = stock_value)) +
+  geom_point(aes(color = stock_type),
+             alpha = 0.5,
+             size = 1) +
+  geom_line(aes(color = stock_type)) +
+  theme_minimal() +
+  geom_line(y = 0, 
+            linetype = 2) +
+  labs(x = "Year",
+       y = "Groundwater stock (10^9 m^3)",
+       title = "Figure 2: California groundwater stock (10^9 m^3), 2000-2050.") +
+  scale_color_discrete(name = "Stock type",
+                       labels = c("expected value", "lower limit", "upper limit"))
+
+ggsave("groundwater stock 2000-2050.jpg", height = 4, width = 7)
+```
 
 
